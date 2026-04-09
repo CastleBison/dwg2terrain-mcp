@@ -20,6 +20,8 @@ DEFAULT_CONFIG = {
 
 DEFAULT_MESH_CONFIG = {
     "method": "grid",
+    "shift_to_local_origin": True,
+    "obj_axis_transform": "blender_default_obj_import",
     "densify_max_segment_length": 10.0,
     "xy_tolerance": 0.000001,
     "grid_spacing": 3.0,
@@ -39,6 +41,8 @@ DEFAULT_MESH_CONFIG = {
 
 HIGHRES_MESH_CONFIG = {
     "method": "grid",
+    "shift_to_local_origin": True,
+    "obj_axis_transform": "blender_default_obj_import",
     "densify_max_segment_length": 5.0,
     "xy_tolerance": 0.000001,
     "grid_spacing": 1.5,

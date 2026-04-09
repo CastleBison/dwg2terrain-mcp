@@ -373,6 +373,48 @@ def _write_obj(output_path: Path, vertices: np.ndarray, faces: np.ndarray) -> No
             handle.write(f"f {a + 1} {b + 1} {c + 1}\n")
 
 
+def _apply_obj_axis_transform(vertices: np.ndarray, config: dict[str, Any]) -> tuple[np.ndarray, dict[str, Any]]:
+    transform = str(config.get("obj_axis_transform", "identity")).strip().lower()
+    if transform == "identity":
+        transformed = vertices
+    elif transform == "blender_default_obj_import":
+        transformed = np.column_stack((vertices[:, 0], vertices[:, 2], -vertices[:, 1]))
+    else:
+        raise MeshBuildError("MESH_EXPORT_FAILED", f"Unsupported obj_axis_transform: {transform}")
+
+    bounds_min = transformed.min(axis=0)
+    bounds_max = transformed.max(axis=0)
+    return transformed, {
+        "obj_axis_transform": transform,
+        "obj_bounds": {
+            "min": bounds_min.tolist(),
+            "max": bounds_max.tolist(),
+        },
+    }
+
+
+def _prepare_obj_vertices(vertices: np.ndarray, config: dict[str, Any]) -> tuple[np.ndarray, dict[str, Any]]:
+    shift_to_local_origin = bool(config.get("shift_to_local_origin", False))
+    if not shift_to_local_origin:
+        obj_vertices, axis_export = _apply_obj_axis_transform(vertices, config)
+        return obj_vertices, {
+            "obj_vertices_shifted": False,
+            "obj_vertex_offset": [0.0, 0.0, 0.0],
+            "obj_axis_transform": axis_export["obj_axis_transform"],
+            "obj_bounds": axis_export["obj_bounds"],
+        }
+
+    offset = np.array([vertices[:, 0].min(), vertices[:, 1].min(), 0.0], dtype=float)
+    local_vertices = vertices - offset
+    obj_vertices, axis_export = _apply_obj_axis_transform(local_vertices, config)
+    return obj_vertices, {
+        "obj_vertices_shifted": True,
+        "obj_vertex_offset": offset.tolist(),
+        "obj_axis_transform": axis_export["obj_axis_transform"],
+        "obj_bounds": axis_export["obj_bounds"],
+    }
+
+
 def validate_mesh_report(mesh_path: Path, report_path: Path) -> bool:
     if not mesh_path.exists() or not report_path.exists():
         return False
@@ -406,8 +448,10 @@ def build_terrain_mesh(input_path: Path, output_path: Path, config: dict[str, An
     else:
         mesh_vertices, faces, rejected, mesh_metrics = _build_grid_faces(source_vertices, config=config, stats=stats)
 
+    obj_vertices, obj_export = _prepare_obj_vertices(mesh_vertices, config)
+
     try:
-        _write_obj(output_path, mesh_vertices, faces)
+        _write_obj(output_path, obj_vertices, faces)
     except OSError as exc:
         raise MeshBuildError("MESH_EXPORT_FAILED", str(exc)) from exc
 
@@ -432,6 +476,10 @@ def build_terrain_mesh(input_path: Path, output_path: Path, config: dict[str, An
             "min": bounds_min.tolist(),
             "max": bounds_max.tolist(),
         },
+        "obj_vertices_shifted": obj_export["obj_vertices_shifted"],
+        "obj_vertex_offset": obj_export["obj_vertex_offset"],
+        "obj_axis_transform": obj_export["obj_axis_transform"],
+        "obj_bounds": obj_export["obj_bounds"],
         "filters": {
             "densify_max_segment_length": densify_max_segment_length,
             "xy_tolerance": xy_tolerance,
