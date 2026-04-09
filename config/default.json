@@ -1,0 +1,15 @@
+{
+  "auto_detect_layers": true,
+  "include_layers": [],
+  "exclude_layers": [],
+  "include_entity_types": [
+    "LWPOLYLINE",
+    "POLYLINE",
+    "SPLINE"
+  ],
+  "min_vertices": 2,
+  "flatten_splines": true,
+  "spline_segments": 32,
+  "require_layer_match": false,
+  "allow_zero_elevation": false
+}

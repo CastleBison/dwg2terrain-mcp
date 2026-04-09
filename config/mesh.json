@@ -1,0 +1,18 @@
+{
+  "method": "grid",
+  "densify_max_segment_length": 10.0,
+  "xy_tolerance": 0.000001,
+  "grid_spacing": 3.0,
+  "grid_mask_mode": "hull",
+  "grid_support_distance_factor": 4.5,
+  "grid_fill_nearest": true,
+  "small_hole_fill_passes": 2,
+  "small_hole_min_neighbors": 5,
+  "smoothing_passes": 2,
+  "smoothing_blend": 0.3,
+  "max_cell_z_levels": 4.0,
+  "max_edge_factor": 6.0,
+  "centroid_distance_factor": 1.8,
+  "min_triangle_area": 0.01,
+  "absolute_max_edge_length": 0.0
+}
