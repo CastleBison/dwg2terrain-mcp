@@ -1,22 +1,22 @@
 # dwg2terrain-mcp
 
-`dwg2terrain-mcp` is a Python package that exposes a DWG/DXF terrain pipeline as both a CLI and a stdio MCP server.
+`dwg2terrain-mcp`는 `DWG/DXF -> 등고선 추출 -> 지형 메쉬 생성` 파이프라인을 CLI와 stdio MCP 서버로 제공하는 Python 패키지입니다.
 
-It focuses on one workflow:
+주요 워크플로우는 다음과 같습니다.
 
-1. convert `DWG` to `DXF` with local ODA File Converter support
-2. scan and isolate contour-like geometry with elevation
-3. generate Blender-friendly terrain meshes as `OBJ`
+1. 로컬 `ODA File Converter`를 이용해 `DWG`를 `DXF`로 변환
+2. 고도값이 있는 등고선 후보를 스캔하고 분리
+3. 블렌더에서 쓰기 좋은 `OBJ` 지형 메쉬 생성
 
-## Install
+## 설치
 
 ```bash
 python -m pip install -e .
 ```
 
-Runtime dependencies are `ezdxf`, `numpy`, `scipy`, and `mcp`.
+런타임 의존성은 `ezdxf`, `numpy`, `scipy`, `mcp` 입니다.
 
-## CLI Quickstart
+## CLI 빠른 시작
 
 ```bash
 dwg2terrain doctor --input "C:\path\sample.dwg" --json
@@ -27,15 +27,15 @@ dwg2terrain mesh "output\contours\sample_contours.dxf" --config "config\mesh.hig
 dwg2terrain validate-mesh --mesh "output\terrain\sample_terrain.obj" --report "output\reports\sample.mesh.json"
 ```
 
-## MCP Server
+## MCP 서버
 
-Start the stdio MCP server with:
+stdio MCP 서버는 아래처럼 실행합니다.
 
 ```bash
 dwg2terrain-mcp
 ```
 
-Exposed tools:
+노출되는 도구는 다음과 같습니다.
 
 - `doctor`
 - `convert`
@@ -44,26 +44,26 @@ Exposed tools:
 - `mesh`
 - `pipeline`
 
-The MCP layer is intentionally thin and wraps the same core functions used by the CLI.
+MCP 레이어는 의도적으로 얇게 유지했고, CLI에서 쓰는 동일한 핵심 함수들을 감싸는 방식입니다.
 
-## ODA Notes
+## ODA 관련 안내
 
-`DWG` conversion is optional and depends on a local ODA File Converter installation.
+`DWG` 변환은 선택 기능이며, 로컬에 `ODA File Converter`가 설치되어 있어야 합니다.
 
-Resolution order:
+ODA 실행 파일은 다음 순서로 찾습니다.
 
 1. explicit CLI/MCP `oda_exe`
 2. `ODA_FILE_CONVERTER_EXE`
 3. common install paths under `C:\Program Files`
 4. `PATH`
 
-If you already have `DXF`, the rest of the pipeline works without ODA.
+이미 `DXF`가 있다면 이후 파이프라인은 ODA 없이도 동작합니다.
 
-## Blender Notes
+## 블렌더 관련 안내
 
-The terrain mesh stage exports `OBJ`. In practice, the most stable results come from the high-resolution Blender-targeted export configuration after contours have been cleaned and extracted.
+지형 메쉬 단계는 `OBJ`를 출력합니다. 실제로는 등고선이 정리된 뒤 고해상도 블렌더용 설정으로 내보낼 때 가장 안정적인 결과를 얻기 쉽습니다.
 
-## Development
+## 개발
 
 ```bash
 python -m pip install -e .[dev]
