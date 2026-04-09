@@ -1,5 +1,7 @@
 {
   "method": "grid",
+  "shift_to_local_origin": true,
+  "obj_axis_transform": "blender_default_obj_import",
   "densify_max_segment_length": 5.0,
   "xy_tolerance": 0.000001,
   "grid_spacing": 1.5,
